@@ -1,0 +1,62 @@
+services:
+  app-front:
+    build: 
+      context: ./frontend/
+      dockerfile: DockerFile
+    ports:
+      - "4173:4173"
+    # deploy:
+    #   replicas: 3
+    # networks:
+    #   - backend
+    # depends_on:
+    #   - db
+
+  app-back:
+    build: 
+      context: ./backend/
+      dockerfile: DockerFile
+    ports:
+      - "3000:3000"
+    # deploy:
+    #   replicas: 3
+    # networks:
+    #   - backend
+    # depends_on:
+    #   - db
+
+  # reverse-proxy:
+  #   image: nginx:1.27
+  #   restart: always
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./reverse-proxy.conf:/etc/nginx/templates/default.conf.template
+  #   networks:
+  #     - proxy
+  #   depends_on:
+  #     - app
+  #     - static
+
+  db:
+    image: mongo:5.0
+    restart: unless-stopped
+    volumes:
+      - data_mongo:/data/db
+    # networks:
+    #   - backend
+
+  # static:
+  #   image: nginx:1.27
+  #   volumes:
+  #     - ./assets:/usr/share/nginx/html
+  #   networks:
+  #     - proxy
+#    ports:
+#      - "81:80"
+
+volumes:
+  data_mongo:
+
+networks:
+  backend:
