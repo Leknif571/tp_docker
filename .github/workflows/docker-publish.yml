@@ -36,8 +36,8 @@ jobs:
         id: push_backend
         uses: docker/build-push-action@v5
         with:
-          context: ./backend
-          file: ../backend/Dockerfile
+          context: ../../backend
+          file: ../../backend/Dockerfile
           push: true
           tags: ${{ steps.meta_backend.outputs.tags }}
           labels: ${{ steps.meta_backend.outputs.labels }}
@@ -77,8 +77,8 @@ jobs:
         id: push_frontend
         uses: docker/build-push-action@v5
         with:
-          context: ./frontend
-          file: ../frontend/Dockerfile
+          context: ../../frontend
+          file: ../../frontend/Dockerfile
           push: true
           tags: ${{ steps.meta_frontend.outputs.tags }}
           labels: ${{ steps.meta_frontend.outputs.labels }}
