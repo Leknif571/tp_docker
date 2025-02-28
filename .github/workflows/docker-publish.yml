@@ -1,15 +1,6 @@
-name: Publish Docker images
-
-on:
-  push:
-    branches:
-      - main
-  release:
-    types: [published]
-
 jobs:
-  push_backend:
-    name: Push Backend Docker Image to Docker Hub
+  push_to_registry:
+    name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -21,71 +12,42 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Extract metadata for Backend Docker Image
-        id: meta_backend
-        uses: docker/metadata-action@v4
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: ${{ secrets.DOCKER_USERNAME }}/backend-service
+          images: username42012/authentication-service
 
+      # Construire et publier l'image pour le backend
       - name: Build and push Backend Docker Image
         id: push_backend
         uses: docker/build-push-action@v5
         with:
-          context: ../../backend
-          file: ../../backend/Dockerfile
+          context: ./backend  # 🔹 Contexte du backend
+          file: ./backend/Dockerfile  # 🔹 Le chemin vers le Dockerfile du backend
           push: true
-          tags: ${{ steps.meta_backend.outputs.tags }}
-          labels: ${{ steps.meta_backend.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Generate artifact attestation for Backend
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-name: index.docker.io/${{ secrets.DOCKER_USERNAME }}/backend-service
-          subject-digest: ${{ steps.push_backend.outputs.digest }}
-          push-to-registry: true
-
-  push_frontend:
-    name: Push Frontend Docker Image to Docker Hub
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
-      attestations: write
-      id-token: write
-    steps:
-      - name: Check out the repo
-        uses: actions/checkout@v4
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Extract metadata for Frontend Docker Image
-        id: meta_frontend
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ secrets.DOCKER_USERNAME }}/frontend-service
-
+      # Construire et publier l'image pour le frontend
       - name: Build and push Frontend Docker Image
         id: push_frontend
         uses: docker/build-push-action@v5
         with:
-          context: ../../frontend
-          file: ../../frontend/Dockerfile
+          context: ./frontend  # 🔹 Contexte du frontend
+          file: ./frontend/Dockerfile  # 🔹 Le chemin vers le Dockerfile du frontend
           push: true
-          tags: ${{ steps.meta_frontend.outputs.tags }}
-          labels: ${{ steps.meta_frontend.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Generate artifact attestation for Frontend
+      - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
         with:
-          subject-name: index.docker.io/${{ secrets.DOCKER_USERNAME }}/frontend-service
-          subject-digest: ${{ steps.push_frontend.outputs.digest }}
+          subject-name: index.docker.io/username42012/authentication-service
+          subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
