@@ -1,3 +1,11 @@
+name: Publish Docker image
+on:
+  push:
+    branches:
+      - main
+  release:
+    types: [published]
+
 jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
@@ -23,24 +31,24 @@ jobs:
         with:
           images: username42012/authentication-service
 
-      # Construire et publier l'image pour le backend
-      - name: Build and push Backend Docker Image
+      # Construire et pousser l'image du backend
+      - name: Build and push Backend Docker image
         id: push_backend
         uses: docker/build-push-action@v5
         with:
-          context: ./backend  # 🔹 Contexte du backend
-          file: ./backend/Dockerfile  # 🔹 Le chemin vers le Dockerfile du backend
+          context: ./backend  # Contexte pour le backend
+          file: ./backend/Dockerfile  # Dockerfile pour le backend
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      # Construire et publier l'image pour le frontend
-      - name: Build and push Frontend Docker Image
+      # Construire et pousser l'image du frontend
+      - name: Build and push Frontend Docker image
         id: push_frontend
         uses: docker/build-push-action@v5
         with:
-          context: ./frontend  # 🔹 Contexte du frontend
-          file: ./frontend/Dockerfile  # 🔹 Le chemin vers le Dockerfile du frontend
+          context: ./frontend  # Contexte pour le frontend
+          file: ./frontend/Dockerfile  # Dockerfile pour le frontend
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
