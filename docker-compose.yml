@@ -1,35 +1,43 @@
 services:
   app-front:
     build:
-      context: ./frontend
+      context: ./frontend/
       dockerfile: Dockerfile
-    ports:
-      - "5173:5173"
     depends_on:
       - app-back
-    # networks:
-    #   - backend
+    networks:
+      - backend
   app-back:
     build:
-      context: ./backend
+      context: ./backend/
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
     depends_on:
       - db
-    # networks:
-    #   - backend
-
+    networks:
+      - backend
   db:
     image: mongo:5.0
     restart: unless-stopped
     volumes:
       - data_mongo:/data/db
-    # networks:
-    #   - backend
+    networks:
+      - backend
+
+  assets:
+    image: nginx:1.27
+    ports:
+      - "80:80"
+    volumes:
+      - ./assets:/usr/share/nginx/html
+    networks:
+      - static
 
 volumes:
   data_mongo:
+  data_build:
 
-# networks:
-#   backend:
+networks:
+  backend:
+  static:
