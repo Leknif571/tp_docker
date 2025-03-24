@@ -1,7 +1,7 @@
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 
 const client = new ApolloClient({
-  uri: "http://localhost:3000/graphql", // URL de ton backend GraphQL NestJS
+  uri: "http://localhost:3000/graphql",
   cache: new InMemoryCache(),
 });
 

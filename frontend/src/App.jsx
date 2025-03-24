@@ -1,4 +1,5 @@
 import { useQuery, gql } from "@apollo/client";
+import { useState } from "react";
 import client from "./apolloClient"; // Assurez-vous que ce fichier est bien configuré
 import "./App.css";
 
@@ -13,7 +14,9 @@ function App() {
     }
   `;
 
-  const { loading, error, data } = useQuery(GET_HELLO, { client });
+  const { loading, error, data } = useQuery(GET_HELLO, { client, fetchPolicy: "network-only", });
+
+  const  [display, setDisplay] = useState(false);
 
   return (
     <>
@@ -30,9 +33,16 @@ function App() {
       </ul>
 
       <h1>Asset</h1>
-      <button>Clique ici pour afficher une image du fichier Asset</button>
-      <img src="/images/asset.png" alt="Asset" />
-    </>
+      <button onClick={() => setDisplay(!display)}>Clique ici pour afficher une image du fichier Asset</button>
+      {display && (
+        <div>
+          <video width="640" height="360" controls autoPlay>
+            <source src="http://localhost:8080/video/video.mp4" type="video/mp4" />
+            Votre navigateur ne supporte pas la lecture des vidéos.
+          </video>
+        </div>
+      )}
+    </> 
   );
 }
 

@@ -9,6 +9,7 @@ services:
       - app-back
     networks:
       - backend
+      - static
   app-back:
     build:
       context: ./backend/
@@ -30,9 +31,11 @@ services:
   assets:
     image: nginx:1.27
     ports:
-      - "80:80"
+      - "8080:80"
     volumes:
       - ./assets:/usr/share/nginx/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+
     networks:
       - static
 
