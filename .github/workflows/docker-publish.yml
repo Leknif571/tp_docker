@@ -29,14 +29,14 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build images with docker-compose
+      - name: Build images with docker compose
         run: |
-          docker-compose -f docker-compose.yml build
+          docker compose -f docker compose.yml build
 
       - name: Get Backend Image ID
         id: backend_image
         run: |
-          backend_image_id=$(docker-compose images -q backend)
+          backend_image_id=$(docker compose images -q backend)
           echo "Backend image ID: $backend_image_id"
           echo "::set-output name=backend_image_id::$backend_image_id"
 
@@ -48,7 +48,7 @@ jobs:
       - name: Get Frontend Image ID
         id: frontend_image
         run: |
-          frontend_image_id=$(docker-compose images -q frontend)
+          frontend_image_id=$(docker compose images -q frontend)
           echo "Frontend image ID: $frontend_image_id"
           echo "::set-output name=frontend_image_id::$frontend_image_id"
 
