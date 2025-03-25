@@ -30,19 +30,19 @@ jobs:
       # Construire l'image frontend
       - name: Build Frontend Docker image
         run: |
-          docker build -t username42013/tpdocker-frontname:latest ./frontend
+          docker build -t username42012/tpdocker-frontname:latest ./frontend
 
       # Construire l'image backend
       - name: Build Backend Docker image
         run: |
-          docker build -t username42013/tpdocker-backend:latest ./backend
+          docker build -t username42012/tpdocker-backend:latest ./backend
 
       # Pousser l'image frontend vers Docker Hub
       - name: Push Frontend Docker image to Docker Hub
         run: |
-          docker push username42013/tpdocker-frontname:latest
+          docker push username42012/tpdocker-frontname:latest
 
       # Pousser l'image backend vers Docker Hub
       - name: Push Backend Docker image to Docker Hub
         run: |
-          docker push username42013/tpdocker-backend:latest
+          docker push username42012/tpdocker-backend:latest
