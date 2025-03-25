@@ -1,4 +1,5 @@
-name: Publish Docker image 
+name: Build and Push Docker Images
+
 on:
   push:
     branches:
@@ -7,71 +8,43 @@ on:
     types: [published]
 
 jobs:
-  push_to_registry:
-    name: Push Docker image to Docker Hub
+  build_and_push:
+    name: Build and Push Docker Images to Docker Hub
     runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: read
-      attestations: write
       id-token: write
+
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v4
+      - name: Check out the repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: username42012/authentication-service
-
-      - name: Build and push Backend Docker image
-        id: push_backend
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend
-          file: ./backend/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}-backend
-          labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Build and push Frontend Docker image
-        id: push_frontend
-        uses: docker/build-push-action@v5
-        with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}-frontend
-          labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Debug Digest
+      - name: Build images with docker-compose
         run: |
-          echo "Backend Digest: ${{ steps.push_backend.outputs.digest }}"
-          echo "Frontend Digest: ${{ steps.push_frontend.outputs.digest }}"
+          docker-compose -f docker-compose.yml build
 
-      - name: Wait for Docker Hub propagation
-        run: sleep 30s
+      - name: Tag and Push Backend Docker image
+        run: |
+          backend_image_id=$(docker images -q backend)
+          docker tag $backend_image_id username42013/project-backend:latest
+          docker push username42013/project-backend:latest
 
-      - name: Generate artifact attestation (Backend)
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-name: index.docker.io/username42012/authentication-service-backend
-          subject-digest: ${{ steps.push_backend.outputs.digest }}
-          push-to-registry: true
+      - name: Tag and Push Frontend Docker image
+        run: |
+          frontend_image_id=$(docker images -q frontend)
+          docker tag $frontend_image_id username42013/project-frontend:latest
+          docker push username42013/project-frontend:latest
 
-      - name: Generate artifact attestation (Frontend)
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-name: index.docker.io/username42012/authentication-service-frontend
-          subject-digest: ${{ steps.push_frontend.outputs.digest }}
-          push-to-registry: true
 
 
 
@@ -141,3 +114,5 @@ jobs:
 #           subject-name: index.docker.io/username42012/authentication-service-frontend
 #           subject-digest: ${{ steps.push_frontend.outputs.digest }}
 #           push-to-registry: true
+
+
