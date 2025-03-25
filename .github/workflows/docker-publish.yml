@@ -31,19 +31,32 @@ jobs:
 
       - name: Build images with docker-compose
         run: |
-          docker compose -f docker-compose.yml build
+          docker-compose -f docker-compose.yml build
+
+      - name: Get Backend Image ID
+        id: backend_image
+        run: |
+          backend_image_id=$(docker-compose images -q backend)
+          echo "Backend image ID: $backend_image_id"
+          echo "::set-output name=backend_image_id::$backend_image_id"
 
       - name: Tag and Push Backend Docker image
         run: |
-          backend_image_id=$(docker images -q backend)
-          docker tag $backend_image_id username42013/tpdocker-backend:latest
-          docker push username42013/tpdocker-backend:latest
+          docker tag ${{ steps.backend_image.outputs.backend_image_id }} username42013/project-backend:latest
+          docker push username42013/project-backend:latest
+
+      - name: Get Frontend Image ID
+        id: frontend_image
+        run: |
+          frontend_image_id=$(docker-compose images -q frontend)
+          echo "Frontend image ID: $frontend_image_id"
+          echo "::set-output name=frontend_image_id::$frontend_image_id"
 
       - name: Tag and Push Frontend Docker image
         run: |
-          frontend_image_id=$(docker images -q frontend)
-          docker tag $frontend_image_id username42013/tpdocker-frontend:latest
-          docker push username42013/tpdocker-frontend:latest
+          docker tag ${{ steps.frontend_image.outputs.frontend_image_id }} username42013/project-frontend:latest
+          docker push username42013/project-frontend:latest
+
 
 
 
