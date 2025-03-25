@@ -31,7 +31,7 @@ jobs:
 
       - name: Build and Push Frontend Docker image
         run: |
-          docker build -f ./frontend/Dockerfile -t username42013/tpdocker-frontend:latest ./frontend
+          docker build -f ./frontend/Dockerfile -t username42013/tpdocker-frontname:latest ./frontend
           docker push username42013/tpdocker-frontend:latest
 
       - name: Build and Push Backend Docker image
