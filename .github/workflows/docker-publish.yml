@@ -29,103 +29,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build images with docker compose
+      - name: Build and Push Frontend Docker image
         run: |
-          docker compose -f docker compose.yml build
+          docker build -f ./frontend/Dockerfile -t username42013/tpdocker-frontend:latest ./frontend
+          docker push username42013/tpdocker-frontend:latest
 
-      - name: Get Backend Image ID
-        id: backend_image
+      - name: Build and Push Backend Docker image
         run: |
-          backend_image_id=$(docker compose images -q backend)
-          echo "Backend image ID: $backend_image_id"
-          echo "::set-output name=backend_image_id::$backend_image_id"
-
-      - name: Tag and Push Backend Docker image
-        run: |
-          docker tag ${{ steps.backend_image.outputs.backend_image_id }} username42013/project-backend:latest
-          docker push username42013/project-backend:latest
-
-      - name: Get Frontend Image ID
-        id: frontend_image
-        run: |
-          frontend_image_id=$(docker compose images -q frontend)
-          echo "Frontend image ID: $frontend_image_id"
-          echo "::set-output name=frontend_image_id::$frontend_image_id"
-
-      - name: Tag and Push Frontend Docker image
-        run: |
-          docker tag ${{ steps.frontend_image.outputs.frontend_image_id }} username42013/project-frontend:latest
-          docker push username42013/project-frontend:latest
-
-
-
-
-
-# name: Publish Docker image 
-# on:
-#   push:
-#     branches:
-#       - main
-#   release:
-#     types: [published]
-
-# jobs:
-#   push_to_registry:
-#     name: Push Docker image to Docker Hub
-#     runs-on: ubuntu-latest
-#     permissions:
-#       packages: write
-#       contents: read
-#       attestations: write
-#       id-token: write
-#     steps:
-#       - name: Check out the repo
-#         uses: actions/checkout@v4
-
-#       - name: Log in to Docker Hub
-#         uses: docker/login-action@v3
-#         with:
-#           username: ${{ secrets.DOCKER_USERNAME }}
-#           password: ${{ secrets.DOCKER_PASSWORD }}
-
-#       - name: Extract metadata (tags, labels) for Docker
-#         id: meta
-#         uses: docker/metadata-action@v5
-#         with:
-#           images: username42012/authentication-service
-
-#       - name: Build and push Backend Docker image
-#         id: push_backend
-#         uses: docker/build-push-action@v5
-#         with:
-#           context: ./backend
-#           file: ./backend/Dockerfile
-#           push: true
-#           tags: ${{ steps.meta.outputs.tags }}-backend
-#           labels: ${{ steps.meta.outputs.labels }}
-
-#       - name: Build and push Frontend Docker image
-#         id: push_frontend
-#         uses: docker/build-push-action@v5
-#         with:
-#           context: ./frontend
-#           file: ./frontend/Dockerfile
-#           push: true
-#           tags: ${{ steps.meta.outputs.tags }}-frontend
-#           labels: ${{ steps.meta.outputs.labels }}
-
-#       - name: Generate artifact attestation (Backend)
-#         uses: actions/attest-build-provenance@v2
-#         with:
-#           subject-name: index.docker.io/username42012/authentication-service-backend
-#           subject-digest: ${{ steps.push_backend.outputs.digest }}
-#           push-to-registry: true
-
-#       - name: Generate artifact attestation (Frontend)
-#         uses: actions/attest-build-provenance@v2
-#         with:
-#           subject-name: index.docker.io/username42012/authentication-service-frontend
-#           subject-digest: ${{ steps.push_frontend.outputs.digest }}
-#           push-to-registry: true
-
-
+          docker build -f ./backend/Dockerfile -t username42013/tpdocker-backend:latest ./backend
+          docker push username42013/tpdocker-backend:latest
