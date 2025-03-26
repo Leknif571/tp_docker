@@ -10,6 +10,8 @@ services:
     networks:
       - backend
       - static
+    volumes:
+      - data_logs:/app/logs
   app-back:
     build:
       context: ./backend/
@@ -20,6 +22,8 @@ services:
       - db
     networks:
       - backend
+    volumes:
+      - data_logs:/app/logs
   db:
     image: mongo:5.0
     restart: unless-stopped
@@ -41,7 +45,7 @@ services:
 
 volumes:
   data_mongo:
-  data_build:
+  data_logs:
 
 networks:
   backend:
